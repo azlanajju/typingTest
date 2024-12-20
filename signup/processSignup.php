@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = 'Passwords do not match.';
     } else {
         // Check if the email already exists
-        $checkStmt = $mysqli->prepare("SELECT id FROM Users WHERE Email = ?");
+        $checkStmt = $conn->prepare("SELECT userID FROM users WHERE Email = ?");
         $checkStmt->bind_param('s', $email);
         $checkStmt->execute();
         $checkStmt->store_result();
@@ -32,9 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
             // Prepare an insert statement
-            $stmt = $mysqli->prepare("INSERT INTO Users (FullName, Email, Password, CreatedOn, Status) VALUES (?, ?, ?, NOW(), 'Active')");
+            $stmt = $conn->prepare("INSERT INTO users (FullName, Email, Password, CreatedOn, Status) VALUES (?, ?, ?, NOW(), 'Active')");
             if ($stmt === false) {
-                $error_message = 'Failed to prepare statement: ' . $mysqli->error;
+                $error_message = 'Failed to prepare statement: ' . $conn->error;
             } else {
                 // Bind parameters
                 $fullName = $firstName . ' ' . $lastName;
@@ -67,5 +67,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Close the connection
-$mysqli->close();
+$conn->close();
 ?>

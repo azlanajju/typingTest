@@ -13,9 +13,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = 'Please fill all fields.';
     } else {
         // Prepare a select statement to check if the email exists
-        $stmt = $mysqli->prepare("SELECT UserID, FullName, Email, Password, CreatedOn, Status FROM Users WHERE Email = ?");
+        $stmt = $conn->prepare("SELECT UserID, FullName, Email, Password, CreatedOn, Status FROM users WHERE Email = ?");
         if ($stmt === false) {
-            $error_message = 'Failed to prepare statement: ' . $mysqli->error;
+            $error_message = 'Failed to prepare statement: ' . $conn->error;
         } else {
             // Bind parameters
             $stmt->bind_param('s', $email);
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_SESSION['userID'] = $userID;
                         $_SESSION['email'] = $storedEmail;
                         $_SESSION['fullName'] = $fullName;
-                        header('Location: home.php');
+                        header('Location: ../');
                     } else {
                         $error_message = 'Incorrect password.';
                     }
@@ -56,5 +56,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Close the connection
-$mysqli->close();
+$conn->close();
 ?>

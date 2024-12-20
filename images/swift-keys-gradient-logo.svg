@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80">
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1f25"/>
+      <stop offset="100%" style="stop-color:#2c3e50"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background keyboard shape with gradient -->
+  <path d="M40 20 L260 20 C270 20 280 30 280 40 L280 60 C280 70 270 80 260 80 L40 80 C30 80 20 70 20 60 L20 40 C20 30 30 20 40 20" fill="url(#bgGradient)"/>
+  
+  <!-- Keyboard keys with rgba(255, 255, 255, 0.1) -->
+  <rect x="30" y="35" width="15" height="15" rx="2" fill="rgba(255, 255, 255, 0.1)"/>
+  <rect x="50" y="35" width="15" height="15" rx="2" fill="rgba(255, 255, 255, 0.1)"/>
+  <rect x="70" y="35" width="15" height="15" rx="2" fill="rgba(255, 255, 255, 0.1)"/>
+  <rect x="40" y="55" width="15" height="15" rx="2" fill="rgba(255, 255, 255, 0.1)"/>
+  <rect x="60" y="55" width="15" height="15" rx="2" fill="rgba(255, 255, 255, 0.1)"/>
+  
+  <!-- Swift Text in white -->
+  <text x="100" y="57" font-family="Inter, sans-serif" font-size="32" font-weight="700" fill="#fff">Swift</text>
+  
+  <!-- Keys Text with accent green -->
+  <text x="190" y="57" font-family="Inter, sans-serif" font-size="32" font-weight="700" fill="#4ade80">Keys</text>
+  
+  <!-- Speed lines with accent green -->
+  <path d="M250 40 L270 40" stroke="#4ade80" stroke-width="3" opacity="0.8"/>
+  <path d="M255 48 L275 48" stroke="#4ade80" stroke-width="3" opacity="0.6"/>
+  <path d="M260 56 L280 56" stroke="#4ade80" stroke-width="3" opacity="0.4"/>
+</svg>
