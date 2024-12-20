@@ -10,16 +10,42 @@ if (!isset($_SESSION['userID']) || !isset($_POST['wpm']) || !isset($_POST['accur
 
 // Default to level 1 if not specified
 $levelID = isset($_POST['levelId']) ? $_POST['levelId'] : 1;
+$stringID = isset($_POST['stringId']) ? $_POST['stringId'] : 1;
 
 try {
+    // First get the LevelNumber from Strings table
+    $getLevelNumber = $conn->prepare("
+        SELECT LevelNumber 
+        FROM Strings 
+        WHERE StringID = ?
+    ");
+    
+    $getLevelNumber->bind_param("i", $stringID);
+    $getLevelNumber->execute();
+    $result = $getLevelNumber->get_result();
+    $stringData = $result->fetch_assoc();
+    
+    if (!$stringData) {
+        throw new Exception("String not found");
+    }
+
+    // Now insert into UserProgress using LevelNumber as StringLevelID
     $stmt = $conn->prepare("
-        INSERT INTO UserProgress (UserID, LevelID, WordsPerMinute, Accuracy, TimeTaken)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO UserProgress (
+            UserID, 
+            LevelID, 
+            StringLevelID, 
+            WordsPerMinute, 
+            Accuracy, 
+            TimeTaken
+        )
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
 
-    $stmt->bind_param("iiddi", 
+    $stmt->bind_param("iiiddi", 
         $_SESSION['userID'],
         $levelID,
+        $stringData['LevelNumber'],  // Using LevelNumber instead of StringID
         $_POST['wpm'],
         $_POST['accuracy'],
         $_POST['timeTaken']

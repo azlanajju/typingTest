@@ -26,6 +26,10 @@ body {
     border-radius: 20px;
     padding: 2.5rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* Header */
@@ -254,4 +258,33 @@ width: 200px;   /* to enable ctrl+backspace*/
 
 .logout-button button:hover {
     background-color: #374151;
+}
+
+.next-button {
+    background-color: #4ade80;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.next-button:hover {
+    background-color: #22c55e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.result-stats {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+    font-size: 18px;
+    font-weight: 500;
 }

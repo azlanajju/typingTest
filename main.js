@@ -5,6 +5,7 @@ const resultsDiv = document.getElementById('results');
 let startTime;
 let currentLevelId = 1; // Default level
 let cursor; // Declare cursor variable
+let currentStringId = 1; // Add stringId variable
 
 // Create and append the cursor immediately
 cursor = document.createElement('div');
@@ -16,14 +17,25 @@ async function fetchTextString(levelId) {
     try {
         const response = await fetch(`get_text.php?levelId=${levelId}`);
         const data = await response.json();
-        if (data.text) {
+        
+        if (data.success) {
             testText = data.text;
+            currentStringId = data.stringId;
+            currentLevelId = data.levelId;
+            currentStringLevelNumber = data.stringLevelNumber;
+            
             loadText();
         } else {
-            console.error('No text received from server');
+            if (data.error === 'No more strings available') {
+                // Handle completion (maybe show a completion message in the UI)
+                document.getElementById('textDisplay').innerHTML = 'All levels completed!';
+            } else {
+                // Handle other errors silently
+                document.getElementById('textDisplay').innerHTML = 'Error loading text. Please try again.';
+            }
         }
     } catch (error) {
-        console.error('Error fetching text:', error);
+        document.getElementById('textDisplay').innerHTML = 'Error loading text. Please try again.';
     }
 }
 
@@ -35,7 +47,7 @@ async function saveProgress(wpm, accuracy, timeTaken) {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `wpm=${wpm}&accuracy=${accuracy}&timeTaken=${timeTaken}&levelId=${currentLevelId}`
+            body: `wpm=${wpm}&accuracy=${accuracy}&timeTaken=${timeTaken}&levelId=${currentLevelId}&stringId=${currentStringId}`
         });
 
         const data = await response.json();
@@ -161,49 +173,5 @@ async function restartTest() {
     inputBox.focus();
 }
 
-// Add this function to get user's current level
-async function getCurrentLevel() {
-    try {
-        console.log('Fetching current level...');
-        const response = await fetch('get_current_level.php');
-        const data = await response.json();
-        console.log('Received level data:', data);
-        
-        if (data.error) {
-            console.error('Server error:', data.error);
-            return 1; // Default to level 1 if there's an error
-        }
-        
-        if (data.levelId) {
-            console.log('Setting current level to:', data.levelId);
-            return data.levelId;
-        } else {
-            console.log('No level ID found, defaulting to 1');
-            return 1; // Default to level 1 if no level found
-        }
-    } catch (error) {
-        console.error('Error fetching current level:', error);
-        return 1; // Default to level 1 if error occurs
-    }
-}
-
-// Modify the initialization function
-async function initializeTest() {
-    try {
-        console.log('Initializing test...');
-        currentLevelId = await getCurrentLevel();
-        console.log('Current level set to:', currentLevelId);
-        await fetchTextString(currentLevelId);
-    } catch (error) {
-        console.error('Error in test initialization:', error);
-        // Fall back to level 1 if there's an error
-        currentLevelId = 1;
-        await fetchTextString(currentLevelId);
-    }
-}
-
-// Make sure this is at the bottom of your file
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, starting initialization...');
-    initializeTest();
-});
+// Initial text load
+fetchTextString(currentLevelId);

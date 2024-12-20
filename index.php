@@ -17,7 +17,7 @@ include("./function_getDetailsForSession.php");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speed Typing Test - <?php echo htmlspecialchars($user['UserName']); ?></title>
+    <title>Swift Keys - <?php echo htmlspecialchars($user['UserName']); ?></title>
     <link rel="stylesheet" href="./style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -53,7 +53,7 @@ include("./function_getDetailsForSession.php");
         </div>
 
         <div class="results" id="results"></div>
-        <div class="tooltip">Press Tab → Enter to restart the test</div>
+        <div class="tooltip">Press Tab → Enter to restart or click Next</div>
     </div>
     <div class="input-area">
         <input type="text" class="input-box" autocomplete="off" id="inputBox" placeholder="Start typing when ready..." autofocus onpaste="return false;">

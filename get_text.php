@@ -3,46 +3,100 @@ session_start();
 include("./configurations/config.php");
 
 if (!isset($_SESSION['userID'])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'User not authenticated']);
-    exit;
+    echo json_encode(['error' => 'Not logged in']);
+    exit();
 }
 
-if (!isset($_GET['levelId'])) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Level ID required']);
-    exit;
-}
+$levelId = isset($_GET['levelId']) ? $_GET['levelId'] : 1;
 
 try {
+    // Get the next uncompleted string in the current level
     $stmt = $conn->prepare("
-        SELECT TextContent 
-        FROM Strings 
-        WHERE LevelID = ? AND IsActive = TRUE 
-        ORDER BY RAND() 
+        WITH CompletedStrings AS (
+            SELECT DISTINCT LevelID, StringLevelID
+            FROM UserProgress
+            WHERE UserID = ?
+        )
+        SELECT 
+            s.StringID,
+            s.TextContent,
+            s.LevelNumber,
+            s.LevelID
+        FROM Strings s
+        LEFT JOIN CompletedStrings cs ON 
+            s.LevelID = cs.LevelID AND 
+            s.LevelNumber = cs.StringLevelID
+        WHERE s.LevelID = ?
+        AND s.IsActive = TRUE
+        AND cs.StringLevelID IS NULL
+        ORDER BY s.LevelNumber ASC
         LIMIT 1
     ");
 
-    $stmt->bind_param("i", $_GET['levelId']);
+    $stmt->bind_param("ii", $_SESSION['userID'], $levelId);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result->num_rows > 0) {
-        $text = $result->fetch_assoc();
-        echo json_encode(['success' => true, 'text' => $text['TextContent']]);
-    } else {
-        // Fallback text if no strings found for the level
+        $row = $result->fetch_assoc();
         echo json_encode([
-            'success' => true, 
-            'text' => 'Default typing test text for practice.'
+            'success' => true,
+            'text' => $row['TextContent'],
+            'stringId' => $row['StringID'],
+            'levelId' => $row['LevelID'],
+            'levelNumber' => $row['LevelNumber'],
+            'stringLevelNumber' => $row['LevelNumber']
         ]);
+    } else {
+        // Only if ALL strings in current level are completed, check next level
+        $nextLevelStmt = $conn->prepare("
+            SELECT 
+                s.StringID,
+                s.TextContent,
+                s.LevelNumber,
+                s.LevelID
+            FROM Strings s
+            LEFT JOIN (
+                SELECT DISTINCT LevelID, StringLevelID
+                FROM UserProgress
+                WHERE UserID = ?
+            ) cs ON 
+                s.LevelID = cs.LevelID AND 
+                s.LevelNumber = cs.StringLevelID
+            WHERE s.LevelID > ?
+            AND s.IsActive = TRUE
+            AND cs.StringLevelID IS NULL
+            ORDER BY s.LevelID ASC, s.LevelNumber ASC
+            LIMIT 1
+        ");
+
+        $nextLevelStmt->bind_param("ii", $_SESSION['userID'], $levelId);
+        $nextLevelStmt->execute();
+        $nextLevelResult = $nextLevelStmt->get_result();
+
+        if ($nextLevelResult->num_rows > 0) {
+            $row = $nextLevelResult->fetch_assoc();
+            echo json_encode([
+                'success' => true,
+                'text' => $row['TextContent'],
+                'stringId' => $row['StringID'],
+                'levelId' => $row['LevelID'],
+                'levelNumber' => $row['LevelNumber'],
+                'stringLevelNumber' => $row['LevelNumber'],
+                'newLevel' => true
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'error' => 'No more strings available'
+            ]);
+        }
     }
 
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Server error']);
+    echo json_encode([
+        'success' => false,
+        'error' => $e->getMessage()
+    ]);
 }
-
-$stmt->close();
-$conn->close();
 ?>

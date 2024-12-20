@@ -9,48 +9,34 @@ if (!isset($_SESSION['userID'])) {
 }
 
 try {
-    // First, get the user's completed levels and their max level
+    // Get the latest progress by checking max level and string level
     $stmt = $conn->prepare("
-        WITH UserMaxLevel AS (
+        WITH MaxProgress AS (
             SELECT 
-                MAX(s.LevelNumber) as MaxCompletedLevel
+                up.LevelID,
+                MAX(up.StringLevelID) as MaxStringLevel
             FROM UserProgress up
-            JOIN Strings s ON up.LevelID = s.LevelID
             WHERE up.UserID = ?
+            GROUP BY up.LevelID
+            ORDER BY up.LevelID DESC, up.StringLevelID DESC
+            LIMIT 1
+        ),
+        MaxStrings AS (
+            SELECT 
+                s.LevelID,
+                MAX(s.LevelNumber) as MaxLevelNumber
+            FROM Strings s
+            WHERE s.IsActive = TRUE
+            GROUP BY s.LevelID
         )
         SELECT 
             CASE
-                -- When user has completed levels, get next available level
-                WHEN uml.MaxCompletedLevel IS NOT NULL THEN
-                    COALESCE(
-                        (
-                            -- Try to get next level
-                            SELECT MIN(s.LevelID)
-                            FROM Strings s
-                            WHERE s.LevelNumber > uml.MaxCompletedLevel
-                            AND s.IsActive = TRUE
-                        ),
-                        (
-                            -- If no next level, get the highest available level
-                            SELECT s.LevelID
-                            FROM Strings s
-                            WHERE s.IsActive = TRUE
-                            ORDER BY s.LevelNumber DESC
-                            LIMIT 1
-                        )
-                    )
-                -- For new users or users with no progress
-                ELSE
-                    (
-                        -- Get the first available level
-                        SELECT s.LevelID
-                        FROM Strings s
-                        WHERE s.IsActive = TRUE
-                        ORDER BY s.LevelNumber ASC
-                        LIMIT 1
-                    )
+                WHEN mp.LevelID IS NULL THEN 1 -- New user starts at level 1
+                WHEN mp.MaxStringLevel >= ms.MaxLevelNumber THEN mp.LevelID + 1 -- Move to next level
+                ELSE mp.LevelID -- Stay in current level
             END as NextLevelID
-        FROM UserMaxLevel uml
+        FROM MaxProgress mp
+        LEFT JOIN MaxStrings ms ON mp.LevelID = ms.LevelID
     ");
 
     $stmt->bind_param("i", $_SESSION['userID']);
