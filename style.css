@@ -1,0 +1,156 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1f25 0%, #2c3e50 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* Container styles */
+.test-container {
+    max-width: 900px;
+    width: 90%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Header */
+.test-container::before {
+    content: "⌨️ Speed Typing Test";
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Text display area */
+.text-display {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    font-size: 1.3rem;
+    line-height: 1.8;
+    letter-spacing: 0.5px;
+    text-align: left;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-display span {
+    display: inline-block;
+    position: relative;
+    margin: 0 1px;
+    transition: all 0.2s ease;
+}
+
+.text-display .correct {
+    color: #4ade80;
+    text-shadow: 0 0 8px rgba(74, 222, 128, 0.3);
+}
+
+.text-display .incorrect {
+    color: #ff4e4e;
+    background: rgba(255, 78, 78, 0.2);
+    border-radius: 2px;
+}
+
+/* Input area */
+.input-area {
+    margin: 1.5rem 0;
+}
+
+.input-box {
+position: fixed;
+top: 0;
+left: 0;
+width: 0;
+height: 0;
+opacity: 0;
+}
+
+
+#textDisplay {
+    position: relative; 
+    /* font-family: monospace;  */
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+
+/* Results display */
+.results {
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+/* Cursor styling */
+.cursor {
+    position: absolute;
+    width: 2px;
+    height: 1.6em;
+    background-color: #4ade80;
+    animation: blink 1s infinite;
+    transition: all 0.1s ease;
+    border-radius: 1px;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .test-container {
+        padding: 1.5rem;
+        width: 95%;
+    }
+
+    .text-display {
+        font-size: 1.1rem;
+        padding: 1.5rem;
+    }
+
+    .test-container::before {
+        font-size: 1.5rem;
+    }
+}
+
+/* Instructions tooltip */
+.tooltip {
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
