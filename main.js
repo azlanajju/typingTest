@@ -93,14 +93,6 @@ function calculateResults() {
     saveProgress(wpm, parseFloat(accuracy), Math.round(timeTaken));
 }
 
-// Add event listeners for level buttons
-document.querySelectorAll('.level-btn').forEach(button => {
-    button.addEventListener('click', async (e) => {
-        currentLevelId = e.target.dataset.levelId;
-        await fetchTextString(currentLevelId);
-        restartTest();
-    });
-});
 
 // Event listener for input changes
 inputBox.addEventListener('input', () => {
@@ -129,6 +121,14 @@ inputBox.addEventListener('input', () => {
     }
 });
 
+function enableNextButton() {
+    document.getElementById('nextButton').style.display = "block";
+
+}
+function disableNextButton() {
+    document.getElementById('nextButton').style.display = "none";
+
+}
 // Simple cursor position update function
 function updateCursorPosition() {
     const spans = textDisplay.querySelectorAll('span');
@@ -175,3 +175,30 @@ async function restartTest() {
 
 // Initial text load
 fetchTextString(currentLevelId);
+
+function endTest() {
+    console.log('Test ended, calculating results'); // Debug log
+    
+    const timeTaken = (Date.now() - startTime) / 1000;
+    const wpm = calculateWPM(timeTaken);
+    const accuracy = calculateAccuracy();
+    
+    // Display results
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = `
+        <div class="result-stats">
+            <div>WPM: ${Math.round(wpm)}</div>
+            <div>Accuracy: ${Math.round(accuracy)}%</div>
+            <div>Time: ${Math.round(timeTaken)}s</div>
+        </div>
+    `;
+    
+    // Enable next button
+    enableNextButton();
+    
+    // Disable input box
+    inputBox.disabled = true;
+    
+    // Save progress
+    saveProgress(wpm, accuracy, timeTaken);
+}

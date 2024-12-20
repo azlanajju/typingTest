@@ -53,6 +53,7 @@ include("./function_getDetailsForSession.php");
         </div>
 
         <div class="results" id="results"></div>
+        <div onclick="restartTest(); disableNextButton();" class="next-button" id="nextButton">Next →</div>
         <div class="tooltip">Press Tab → Enter to restart or click Next</div>
     </div>
     <div class="input-area">
